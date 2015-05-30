@@ -17,17 +17,17 @@ class PlayerShip {
   boolean dead = false;
   boolean shipDetect = false;
   
-  int w = 20;
+  int w = 40;
   int h = 40;
-  float errorPoint = 100;
+  float errorPoint = 10;
   
   PlayerShip(int x, int y, int player) {
     coords[0][0] = x;
     coords[0][1] = y;
-    coords[1][0] = x  - h;
-    coords[1][1] = y + w/2;
-    coords[2][0] = x - h;
-    coords[2][1] = y - w/2;
+    coords[1][0] = x - w;
+    coords[1][1] = y + h/2;
+    coords[2][0] = x - w;
+    coords[2][1] = y - h/2;
     centroidX = (coords[0][0] + coords[1][0] + coords[2][0])/3;
     centroidY = (coords[0][1] + coords[1][1] + coords[2][1])/3;
     float c2bX = abs(coords[1][0] - centroidX);
@@ -75,84 +75,49 @@ class PlayerShip {
     bullets.add(b);
   }
   
-  /*boolean onSegment(float[] P , float[] Q, float[] R) {
-    if (Q[0] <= max(P[0], R[0]) && Q[0] >= min(P[0], R[0]) 
-    && Q[1] <= max(P[1], R[1]) && Q[1] >= min(P[1], R[1])) {
-      return true;
-    }
-    return false;
-  }
-  
-  int orientation(float[] P , float[] Q, float[] R) {
-    float val = (Q[1] - P[1]) * (R[0] - Q[0]) - (Q[0] - P[0]) * (R[1] - Q[1]);
-    
-    if (val == 0) {
-      return 0;
-    }
-    else if (val > 0) {
-      return 1;
+  boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {
+    float A = P2[1] - P1[1];
+    float B = P1[0] - P2[0];
+    float C = A*P1[0] + B*P1[1];
+    float A1 = Q2[1] - Q1[1];
+    float B1 = Q1[0] - Q2[0];
+    float C1 = A*Q1[0] + B*Q1[1];
+    float det = A*B1 - A1*B;
+    if (abs(det) <= errorPoint) {
+      return false;
     }
     else {
-      return 2;
-    }
-  }
-  
-  boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {
-    int o1 = orientation(P1, Q1, P2);
-    int o2 = orientation(P1, Q1, Q2);
-    int o3 = orientation(P2, Q2, P1);
-    int o4 = orientation(P2, Q2, Q1); 
-    
-    if (o1 != o2 && o3 != o4) {
-      return true;
-    }
-    return false;
-  }
-
-  boolean triangleIntersect(PlayerShip other) {
-    stroke(0,255, 255);
-    strokeWeight(10);
-    line(coords[0][0], coords[0][1], coords[2][0], coords[2][1]);
-    line(other.coords[0][0], other.coords[0][1], other.coords[1][0], other.coords[1][1]);
-    strokeWeight(1);
-    boolean[][] tests = new boolean[9][2];
-    //tri1
-    tests[0][0] = intersect(coords[0], coords[2], other.coords[0], other.coords[1]);
-    tests[0][1] = intersect(coords[0], coords[1], other.coords[0], other.coords[1]);
-    
-    tests[1][0] = intersect(coords[0], coords[2], other.coords[1], other.coords[2]);
-    tests[1][1] = intersect(coords[0], coords[1], other.coords[1], other.coords[2]);
-    
-    tests[2][0] = intersect(coords[0], coords[2], other.coords[0], other.coords[2]);
-    tests[2][1] = intersect(coords[0], coords[1], other.coords[0], other.coords[2]);
-    
-    //tri2
-    tests[3][0] = intersect(coords[0], coords[1], other.coords[0], other.coords[1]);
-    tests[3][1] = intersect(coords[1], coords[2], other.coords[0], other.coords[1]);
-       
-    tests[4][0] = intersect(coords[0], coords[1], other.coords[1], other.coords[2]);
-    tests[4][1] = intersect(coords[1], coords[2], other.coords[1], other.coords[2]);
-    
-    tests[5][0] = intersect(coords[0], coords[1], other.coords[0], other.coords[2]);
-    tests[5][1] = intersect(coords[1], coords[2], other.coords[0], other.coords[2]);
-    
-    //tri3
-    tests[6][0] = intersect(coords[0], coords[2], other.coords[0], other.coords[1]);
-    tests[6][1] = intersect(coords[1], coords[2], other.coords[0], other.coords[1]);
-    
-    tests[7][0] = intersect(coords[0], coords[2], other.coords[1], other.coords[2]);
-    tests[7][1] = intersect(coords[1], coords[2], other.coords[1], other.coords[2]);
-    
-    tests[8][0] = intersect(coords[0], coords[2], other.coords[0], other.coords[2]);
-    tests[8][1] = intersect(coords[1], coords[2], other.coords[0], other.coords[2]);
-    for (int x = 0; x < tests.length; x++) {
-      if (tests[x][0] && tests[x][1]) {
+      float xIntersect = (B1*C - B*C1)/det;
+      float yIntersect = (A*C1 - A1*C)/det;
+      if (xIntersect >= min(P1[0], P2[0])-errorPoint && xIntersect <= max(P1[0], P2[0])+errorPoint
+      && yIntersect >= min(P1[1], P2[1])-errorPoint && yIntersect <= max(P1[1], P2[1])+errorPoint
+      && xIntersect >= min(Q1[0], Q2[0])-errorPoint && xIntersect <= max(Q1[0], Q2[0])+errorPoint
+      && yIntersect >= min(Q1[1], Q2[1])-errorPoint&& yIntersect <= max(Q1[1], Q2[1])+errorPoint) {
         return true;
       }
     }
     return false;
-  }*/
-  
+  }
+
+  boolean triangleCheck(PlayerShip other) {
+    boolean[] tests = new boolean[9];
+    tests[0] = intersect(coords[0], coords[1], other.coords[0], other.coords[1]);    
+    tests[1] = intersect(coords[0], coords[1], other.coords[1], other.coords[2]);
+    tests[2] = intersect(coords[0], coords[1], other.coords[0], other.coords[2]);
+    tests[3] = intersect(coords[1], coords[2], other.coords[0], other.coords[1]);       
+    tests[4] = intersect(coords[1], coords[2], other.coords[1], other.coords[2]);    
+    tests[5] = intersect(coords[1], coords[2], other.coords[0], other.coords[2]);
+    tests[6] = intersect(coords[0], coords[2], other.coords[0], other.coords[1]); 
+    tests[7] = intersect(coords[0], coords[2], other.coords[1], other.coords[2]);    
+    tests[8] = intersect(coords[0], coords[2], other.coords[0], other.coords[2]);
+    for (int x = 0; x < tests.length; x++) {
+      if (tests[x]) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /*
   boolean triangleCheck(float[] P) {
     float area = abs(coords[0][0]*coords[1][1] + coords[1][0]*coords[2][1]
     + coords[2][0]*coords[0][1] - coords[0][0]*coords[2][1]
@@ -173,7 +138,7 @@ class PlayerShip {
     else {
       return false;
     }
-  }
+  }*/
   
   boolean squareCheck(PlayerShip other) {
     if (abs(centroidX - other.centroidX) < 2*radiusPoint 

@@ -5,7 +5,7 @@ int h;
 
 int reload = 20;
 int reloadCount = 0;
-int speed = 10;
+int speed = 1;
 boolean[] keys = new boolean[255];
 
 float[][] boundaries = new float[players.length][2];
@@ -23,8 +23,8 @@ void draw() {
   updateKeys();
   movePlayers();
   for (int i = 0; i < players.length; i++) {
-    checkPlayers(i);
     players[i].update();
+    checkPlayers(i);
     players[i].display();
   }
 }
@@ -59,14 +59,12 @@ void checkPlayers(int player) {
   for (int i = 0; i < players.length; i++) {
     if (i != player) {
       if (players[player].squareCheck(players[i])) {
-        for(int j = 0; j < (players[player].coords).length; j++) {
-          if(players[player].triangleCheck((players[i]).coords[j])) {
-            players[player].shipDetect = true;
-            return;
-          }
-          else {
-            players[player].shipDetect = false;
-          }
+        if(players[player].triangleCheck(players[i])) {
+          players[player].shipDetect = true;
+          return;
+        }
+        else {
+          players[player].shipDetect = false;
         }
       }
       else {
