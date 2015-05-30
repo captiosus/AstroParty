@@ -1,5 +1,7 @@
 PlayerShip[] players = new PlayerShip[2];
 
+ArrayList<PlayerShip> collisions = new ArrayList<PlayerShip>();
+
 int w;
 int h;
 
@@ -23,8 +25,8 @@ void draw() {
   updateKeys();
   movePlayers();
   for (int i = 0; i < players.length; i++) {
-    players[i].update();
     checkPlayers(i);
+    players[i].update();
     players[i].display();
   }
 }
@@ -55,20 +57,36 @@ void updateKeys() {
   }
 }
 
+
 void checkPlayers(int player) {
   for (int i = 0; i < players.length; i++) {
     if (i != player) {
       if (players[player].squareCheck(players[i])) {
         if(players[player].triangleCheck(players[i])) {
-          players[player].shipDetect = true;
+          if(!(collisions.contains(players[i]))) {
+            players[player].shipDetect = true;
+            players[i].shipDetect = true;
+            collisions.add(players[player]);
+            collisions.add(players[i]);
+            players[player].collideMove(players[i], speed);
+          }
+          else {
+            players[player].collideMove(players[i], speed);
+          }
           return;
         }
         else {
+          collisions.remove(players[player]);
+          collisions.remove(players[i]);
           players[player].shipDetect = false;
+          players[i].shipDetect = false;
         }
       }
       else {
+        collisions.remove(players[player]);
+        collisions.remove(players[i]);
         players[player].shipDetect = false;
+        players[i].shipDetect = false;
       }
     }
   }
@@ -78,7 +96,7 @@ void setupPlayers() {
   int xStart = w * 5;
   int yStart = w * 5;
   players[0] = new PlayerShip(xStart, yStart, 0);
-  players[1] = new PlayerShip(width - xStart,height - yStart, 1);
+  players[1] = new PlayerShip(width - xStart, height - yStart, 1);
   for (int i = 0; i < players.length; i++) {
     players[i].rotate(PI*2);
   }
