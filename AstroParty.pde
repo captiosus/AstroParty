@@ -7,13 +7,13 @@ int h;
 
 int reload = 20;
 int reloadCount = 0;
-int speed = 1;
+int speed = 5;
 boolean[] keys = new boolean[255];
 
 float[][] boundaries = new float[players.length][2];
 
 void setup() {
-  size(1040, 720);
+  size(800, 600);
   frameRate(60);
   players[0] = new PlayerShip(0, 0, 0);
   w = players[0].w;
@@ -97,9 +97,7 @@ void setupPlayers() {
   int yStart = w * 5;
   players[0] = new PlayerShip(xStart, yStart, 0);
   players[1] = new PlayerShip(width - xStart, height - yStart, 1);
-  for (int i = 0; i < players.length; i++) {
-    players[i].rotate(PI*2);
-  }
+  players[1].rotate(PI);
 }
 
 void movePlayers() {

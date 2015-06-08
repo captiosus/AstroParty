@@ -17,8 +17,8 @@ class PlayerShip {
   boolean dead = false;
   boolean shipDetect = false;
   
-  int w = 40;
-  int h = 40;
+  int w = 50;
+  int h = 30;
   float errorPoint = 1;
   
   PlayerShip(int x, int y, int player) {
@@ -60,6 +60,9 @@ class PlayerShip {
   
   void rotate(float angle) {
     rotateAngle += angle;
+    if (rotateAngle > PI) {
+      rotateAngle -= 2*PI;
+    }
   }
   
   void moveForward(int speed) {
@@ -71,31 +74,35 @@ class PlayerShip {
   }
   
   void collideMove(PlayerShip other, int speed) {
-    if (!(coords[0][0] > width || coords[0][0] < 0 || 
-    coords[0][1] > height || coords[0][1] < 0 ||
-    other.coords[0][0] > width || other.coords[0][0] < 0 || 
-    other.coords[0][1] > height || other.coords[0][1] < 0) || 
-    coords[1][0] > width || coords[1][0] < 0 || 
-    coords[1][1] > height || coords[1][1] < 0 ||
-    other.coords[1][0] > width || other.coords[1][0] < 0 || 
-    other.coords[1][1] > height || other.coords[1][1] < 0 || 
-    coords[2][0] > width || coords[2][0] < 0 || 
-    coords[2][1] > height || coords[2][1] < 0 ||
-    other.coords[2][0] > width || other.coords[2][0] < 0 || 
-    other.coords[2][1] > height || other.coords[2][1] < 0) {
-      float angle = rotateAngle - other.rotateAngle;
-      float resultSpeedX = speed * cos(rotateAngle) + speed * cos(other.rotateAngle);
-      float resultSpeedY = speed * sin(rotateAngle) + speed * sin(other.rotateAngle);
-      centroidX += resultSpeedX/2;
-      centroidY += resultSpeedY/2;
-      other.centroidX += resultSpeedX/2;
-      other.centroidY += resultSpeedY/2;
+    if (inBounds() && other.inBounds()) {
+      float angle = (rotateAngle + other.rotateAngle)/2;
+      float resultSpeed = 10;
+      centroidX += resultSpeed * cos(angle);
+      centroidY += resultSpeed * sin(angle);
+      other.centroidX += resultSpeed * cos(angle);
+      other.centroidY += resultSpeed * sin(angle);
     }
   }
-
+  
+  void bounce() {
+    if (inBounds()) {
+      centroidX += 1 * cos(abs(PI-rotateAngle));
+      centroidY += 1 * sin(abs(PI-rotateAngle));
+    }
+  }
+  
   void shoot() {
     Bullet b = new Bullet(coords[0][0], coords[0][1],rotateAngle, player);
     bullets.add(b);
+  }
+  
+  boolean inBounds() {
+    return !(coords[0][0] > width || coords[0][0] < 0 || 
+    coords[0][1] > height || coords[0][1] < 0 ||
+    coords[1][0] > width || coords[1][0] < 0 || 
+    coords[1][1] > height || coords[1][1] < 0 ||
+    coords[2][0] > width || coords[2][0] < 0 || 
+    coords[2][1] > height || coords[2][1] < 0);
   }
   
   boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {
@@ -126,6 +133,7 @@ class PlayerShip {
     tests[8] = intersect(coords[0], coords[2], other.coords[0], other.coords[2]);  
     for (int x = 0; x < tests.length; x++) {
       if (tests[x]) {
+        bounce();
         return true;
       }
     }
@@ -159,7 +167,7 @@ class PlayerShip {
       Bullet b = bullets.get(i);
       if (!(b.x > width + b.rad || b.x < 0 - b.rad || 
       b.y > height + b.rad|| b.y < 0 - b.rad)) {
-        b.moveForward(5);
+        b.moveForward(8);
       }
       else {
         bullets.remove(i);
