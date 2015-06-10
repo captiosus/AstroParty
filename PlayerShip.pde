@@ -105,6 +105,19 @@ class PlayerShip {
     coords[2][1] > height || coords[2][1] < 0);
   }
   
+  boolean wallCollision(Obstacle o, PlayerShip p) {
+    float[][] wallTop = new float[o.size][1];
+    float[][] wallBottom = new float[o.size][1];
+    float[][] wallLSide = new float[o.size][1];
+    float[][] wallRSide = new float[o.size][1];
+    
+    for (int i = 0; i < wallTop.length; i ++)
+      wallTop[i] = ;
+      wallTop[i][0] = o.ycor;
+    
+    for (int i = 0; i < wallTop.length; i ++) {
+        if (p.centroidX == 
+  
   boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {
     float denominator=((P2[0]-P1[0])*(Q2[1]-Q1[1]))-((P2[1]-P1[1])*(Q2[0]-Q1[0]));
     float num1=((P1[1]-Q1[1])*(Q2[0]-Q1[0]))-((P1[0]-Q1[0])*(Q2[1]-Q1[1]));
