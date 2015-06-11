@@ -105,7 +105,7 @@ class PlayerShip {
     coords[2][1] > height || coords[2][1] < 0);
   }
   
-  Boolean wallCollision(Obstacle o, PlayerShip p) {
+  boolean wallCollision(Obstacle o, PlayerShip p) {
     float[][] wallTop = new float[o.size][2];
     float[][] wallBottom = new float[o.size][2];
     float[][] wallLSide = new float[o.size][2];
