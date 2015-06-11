@@ -105,7 +105,7 @@ class PlayerShip {
     coords[2][1] > height || coords[2][1] < 0);
   }
   
-  void wallCollision(Obstacle o, PlayerShip p) {
+  Boolean wallCollision(Obstacle o, PlayerShip p) {
     float[][] wallTop = new float[o.size][2];
     float[][] wallBottom = new float[o.size][2];
     float[][] wallLSide = new float[o.size][2];
@@ -144,6 +144,7 @@ class PlayerShip {
       if (sqrt(sq(p.centroidX - wallRSide[i][0]) + sq(p.centroidY - wallRSide[i][1])) <= w)
         wallConflict = true;
     }
+    return wallConflict;
   }
   
   boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {
