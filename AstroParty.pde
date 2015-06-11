@@ -62,7 +62,7 @@ void checkPlayers(int player) {
   for (int i = 0; i < players.length; i++) {
     if (i != player) {
       if (players[player].squareCheck(players[i])) {
-        if(players[player].triangleCheck(players[i])) {
+        if(players[player].circleIntersect(players[i])) {
           if(!(collisions.contains(players[i]))) {
             players[player].shipDetect = true;
             players[i].shipDetect = true;

@@ -17,9 +17,11 @@ class PlayerShip {
   boolean dead = false;
   boolean shipDetect = false;
   
-  int w = 50;
-  int h = 30;
+  int w = 40;
+  int h = 20;
   float errorPoint = 1;
+  
+  int circleHitbox = 20;
   
   PlayerShip(int x, int y, int player) {
     coords[0][0] = x;
@@ -60,7 +62,7 @@ class PlayerShip {
   
   void rotate(float angle) {
     rotateAngle += angle;
-    if (rotateAngle > PI) {
+    if (rotateAngle > PI/2) {
       rotateAngle -= 2*PI;
     }
   }
@@ -74,20 +76,55 @@ class PlayerShip {
   }
   
   void collideMove(PlayerShip other, int speed) {
-    if (inBounds() && other.inBounds()) {
-      float angle = (rotateAngle + other.rotateAngle)/2;
-      float resultSpeed = 10;
-      centroidX += resultSpeed * cos(angle);
-      centroidY += resultSpeed * sin(angle);
-      other.centroidX += resultSpeed * cos(angle);
-      other.centroidY += resultSpeed * sin(angle);
-    }
-  }
+    float xDistance = (centroidX - other.centroidX)/circleHitbox;
+    float yDistance = (centroidY - other.centroidY)/circleHitbox;
+    float normX = -1 * yDistance;
+    float normY = xDistance;
+    float normDot = (speed * cos(rotateAngle) * normX) + (speed * sin(rotateAngle) * normY);
+    float collisionDot = (speed * cos(rotateAngle) * xDistance) + (speed * sin(rotateAngle) * yDistance);
+}
   
-  void bounce() {
-    if (inBounds()) {
-      centroidX += 1 * cos(abs(PI-rotateAngle));
-      centroidY += 1 * sin(abs(PI-rotateAngle));
+  boolean circleIntersect(PlayerShip other) {
+    float xDistance = centroidX - other.centroidX;
+    float yDistance = centroidY - other.centroidY;
+    float hypotenuse = sqrt(pow(xDistance, 2) + pow(yDistance, 2));
+    println(hypotenuse);
+    if (hypotenuse < circleHitbox) {
+      bounce(hypotenuse, xDistance, yDistance, other.centroidX, other.centroidY, other);
+      return true;
+    }
+    return false;
+  }
+    
+  
+  void bounce(float hypotenuse, float xDistance, 
+  float yDistance, float otherX, float otherY, PlayerShip other) {
+    float angle = atan(yDistance/xDistance);
+    println("bounce");
+    float bounceDistance = circleHitbox - hypotenuse;
+    float bounceX = cos(angle) * bounceDistance + 1;
+    float bounceY = sin(angle) * bounceDistance + 1;
+    if (otherX > centroidX) {
+      if (coords[0][0] - bounceX < 0) {
+        println("X");
+        other.centroidX += bounceX;
+      }
+    }
+    else {
+       if (coords[0][0] + bounceX > width) {
+        other.centroidX -= bounceX;
+      }
+    }
+    if (otherY > centroidY) {
+      if (coords[0][1] + bounceY < 0) {
+        other.centroidY += bounceY;
+      }
+    }
+    else {
+      println("Y");
+      if (coords[0][1] + bounceY > height) {
+        other.centroidY -= bounceY;
+      }
     }
   }
   
@@ -133,7 +170,6 @@ class PlayerShip {
     tests[8] = intersect(coords[0], coords[2], other.coords[0], other.coords[2]);  
     for (int x = 0; x < tests.length; x++) {
       if (tests[x]) {
-        bounce();
         return true;
       }
     }
@@ -163,6 +199,8 @@ class PlayerShip {
     fill(red, green, blue);
     triangle(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
     coords[2][0], coords[2][1]);
+    fill(255,255,255);
+    ellipse(centroidX,centroidY, 20, 20);
     for (int i = 0; i < bullets.size(); i++) {
       Bullet b = bullets.get(i);
       if (!(b.x > width + b.rad || b.x < 0 - b.rad || 
