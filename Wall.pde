@@ -1,10 +1,10 @@
-class Obstacle {
+class Wall {
   float xcor;
   float ycor;
   int size;
 
 
-  Obstacle (float x, float y, int sideLen) {
+  Wall (float x, float y, int sideLen) {
     xcor = x;
     ycor = y;
     size = sideLen;
