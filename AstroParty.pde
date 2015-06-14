@@ -6,7 +6,7 @@ int w;
 int h;
 
 int reload = 5;
-int reloadCount = 0;
+int reloadCount = 5;
 int speed = 5;
 boolean[] keys = new boolean[255];
 
@@ -27,9 +27,12 @@ void draw() {
   updateKeys();
   movePlayers();
   for (int i = 0; i < players.length; i++) {
-    checkPlayers(i);
-    players[i].update();
-    players[i].display();
+    if (!players[i].destroyed) {
+      checkBullets(players[i]);
+      checkPlayers(i);
+      players[i].update();
+      players[i].display();
+    }
   }
 }
 
@@ -56,6 +59,15 @@ void updateKeys() {
   }
   if (keys['D']) {
     players[1].rotate(PI/50);
+  }
+  if (keys['W']) {
+    if (reloadCount < reload) {
+      reloadCount++;
+    }
+    else {
+      reloadCount = 0;
+      players[1].shoot();
+    }
   }
 }
 
@@ -89,6 +101,22 @@ void checkPlayers(int player) {
         collisions.remove(players[i]);
         players[player].shipDetect = false;
         players[i].shipDetect = false;
+      }
+    }
+  }
+}
+
+void checkBullets(PlayerShip player) {
+  for (int i = 0; i < (player.bullets).length; i++) {
+    if (!(player.bullets[i]).onHold) {
+      for (int j = 0; j < players.length; j++) {
+        if (players[j] != player) {
+          if (players[j].squareCheckBullet(player.bullets[i])) {
+            if (players[j].bulletCollide(player.bullets[i])) {
+              players[j].destroy();
+            }
+          }
+        }
       }
     }
   }

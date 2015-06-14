@@ -26,7 +26,10 @@ class PlayerShip {
   int numBullets = 3;
   Bullet[] bullets = new Bullet[numBullets];
   
+  boolean destroyed;
+  
   PlayerShip(int x, int y, int player) {
+    destroyed = false;
     for (int i = 0; i < bullets.length; i++) {
       bullets[i] = new Bullet(player);
       bullets[i].hold(i, numBullets, centroidX, centroidY);
@@ -95,7 +98,6 @@ class PlayerShip {
     float xDistance = centroidX - other.centroidX;
     float yDistance = centroidY - other.centroidY;
     float hypotenuse = sqrt(pow(xDistance, 2) + pow(yDistance, 2));
-    println(hypotenuse);
     if (hypotenuse < circleHitbox) {
       bounce(hypotenuse, xDistance, yDistance, other.centroidX, other.centroidY, other);
       return true;
@@ -107,13 +109,11 @@ class PlayerShip {
   void bounce(float hypotenuse, float xDistance, 
   float yDistance, float otherX, float otherY, PlayerShip other) {
     float angle = atan(yDistance/xDistance);
-    println("bounce");
     float bounceDistance = circleHitbox - hypotenuse;
     float bounceX = cos(angle) * bounceDistance + 1;
     float bounceY = sin(angle) * bounceDistance + 1;
     if (otherX > centroidX) {
       if (coords[0][0] - bounceX < 0) {
-        println("X");
         other.centroidX += bounceX;
       }
       else {
@@ -122,7 +122,6 @@ class PlayerShip {
     }
     else {
        if (coords[0][0] + bounceX > width) {
-        println("X1");
         other.centroidX -= bounceX;
       }
       else {
@@ -131,7 +130,6 @@ class PlayerShip {
     }
     if (otherY > centroidY) {
       if (coords[0][1] + bounceY < 0) {
-        println("Y");
         other.centroidY += bounceY;
       }
       else {
@@ -139,8 +137,7 @@ class PlayerShip {
       }
     }
     else {
-      if (coords[0][1] + bounceY > height) {
-        println("Y1");
+      if (coords[0][1] + bounceY > height) { 
         other.centroidY -= bounceY;
       }
       else {
@@ -262,13 +259,75 @@ class PlayerShip {
     }
   }
   
+  boolean squareCheckBullet(Bullet b) {
+    float squareX = centroidX - radiusPoint;
+    float squareY = centroidY - radiusPoint;
+    float closestX;
+    float closestY;
+    if (b.x < squareX) {
+      closestX = squareX;
+    }
+    else if (b.x > squareX + 2*radiusPoint) {
+      closestX = squareX + 2*radiusPoint;
+    }
+    else {
+      closestX = b.x;
+    }
+    if (b.y < squareY) {
+      closestY = squareY;
+    }
+    else if (b.y > squareY + 2*radiusPoint) {
+      closestY = squareY + 2*radiusPoint;
+    }
+    else {
+      closestY = b.y;
+    }
+    if(pow((closestX - b.x), 2) + pow((closestY - b.y), 2) < pow(b.rad, 2)) {
+      return true;
+    }
+    return false;
+  }
+  
+  boolean bulletCollide(Bullet b) {
+    PVector side1 = new PVector(coords[0][0] - coords[1][0], coords[0][1] - coords[1][1]);
+    PVector side2 = new PVector(coords[0][0] - coords[2][0], coords[0][1] - coords[2][1]);
+    PVector side3 = new PVector(coords[1][0] - coords[2][0], coords[1][1] - coords[2][1]);
+    PVector test1 = new PVector(b.x - coords[0][0], b.y - coords[0][1]);
+    PVector test2 = new PVector(b.x - coords[1][0], b.y - coords[1][1]);
+    PVector test3 = new PVector(b.x - coords[2][0], b.y - coords[2][1]);
+    float yDist1 = test1.dot(side1)/side1.mag();
+    float xDist1 = pow(test1.mag(), 2) - pow(yDist1, 2);
+    float yDist2 = test2.dot(side2)/side2.mag();
+    float xDist2 = pow(test2.mag(), 2) - pow(yDist2, 2);
+    float yDist3 = test3.dot(side3)/side3.mag();
+    float xDist3 = pow(test3.mag(), 2) - pow(yDist3, 2);
+    if (xDist1 <= pow(b.rad, 2)) {
+      if (test1.dot(side1) > 0 && yDist1 < side1.mag()) {
+        return true;
+      }
+    }
+    else if (xDist2 <= pow(b.rad, 2)) {
+      if (test2.dot(side2) > 0 && yDist2 < side2.mag()) {
+        return true;
+      }
+    }
+    else if (xDist3 <= pow(b.rad, 2)) {
+      if (test3.dot(side3) > 0 && yDist3 < side3.mag()) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  void destroy() {
+    destroyed = true;
+  }
+  
   void display() {
     stroke(255, 255, 255);
     fill(red, green, blue);
     triangle(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
     coords[2][0], coords[2][1]);
-    fill(255,255,255);
-    ellipse(centroidX,centroidY, 20, 20);
     bullet();
   }
   
