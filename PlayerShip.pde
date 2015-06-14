@@ -331,6 +331,12 @@ class PlayerShip {
     bullet();
   }
   
+  
+  //AI
+  
+  
+  
+  
  /* 
   boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {
     float denominator=((P2[0]-P1[0])*(Q2[1]-Q1[1]))-((P2[1]-P1[1])*(Q2[0]-Q1[0]));
