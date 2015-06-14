@@ -5,10 +5,11 @@ ArrayList<PlayerShip> collisions = new ArrayList<PlayerShip>();
 int w;
 int h;
 
-int reload = 20;
+int reload = 5;
 int reloadCount = 0;
 int speed = 5;
 boolean[] keys = new boolean[255];
+
 
 float[][] boundaries = new float[players.length][2];
 
@@ -19,6 +20,7 @@ void setup() {
   w = players[0].w;
   h = players[0].h;
   setupPlayers();
+  
 }
 void draw() {
   background(0, 0, 0);

@@ -1,6 +1,5 @@
 class PlayerShip {
   float[][] coords = new float[3][2];
-  ArrayList<Bullet> bullets = new ArrayList<Bullet>();
   float centroidX;
   float centroidY;
   float rotateAngle;
@@ -23,7 +22,15 @@ class PlayerShip {
   
   int circleHitbox = 20;
   
+  int bulletSpeed = 8;
+  int numBullets = 3;
+  Bullet[] bullets = new Bullet[numBullets];
+  
   PlayerShip(int x, int y, int player) {
+    for (int i = 0; i < bullets.length; i++) {
+      bullets[i] = new Bullet(player);
+      bullets[i].hold(i, numBullets, centroidX, centroidY);
+    }
     coords[0][0] = x;
     coords[0][1] = y;
     coords[1][0] = x - w;
@@ -109,28 +116,37 @@ class PlayerShip {
         println("X");
         other.centroidX += bounceX;
       }
+      else {
+        centroidX -= bounceX;
+      }
     }
     else {
        if (coords[0][0] + bounceX > width) {
+        println("X1");
         other.centroidX -= bounceX;
+      }
+      else {
+        centroidX += bounceX;
       }
     }
     if (otherY > centroidY) {
       if (coords[0][1] + bounceY < 0) {
+        println("Y");
         other.centroidY += bounceY;
+      }
+      else {
+        centroidY -= bounceY;
       }
     }
     else {
-      println("Y");
       if (coords[0][1] + bounceY > height) {
+        println("Y1");
         other.centroidY -= bounceY;
       }
+      else {
+        centroidY += bounceY;
+      }
     }
-  }
-  
-  void shoot() {
-    Bullet b = new Bullet(coords[0][0], coords[0][1],rotateAngle, player);
-    bullets.add(b);
   }
   
   boolean inBounds() {
@@ -142,7 +158,7 @@ class PlayerShip {
     coords[2][1] > height || coords[2][1] < 0);
   }
   
-  boolean wallCollision(Obstacle o, PlayerShip p) {
+  boolean wallCollision(Wall o, PlayerShip p) {
     float[][] wallTop = new float[o.size][2];
     float[][] wallBottom = new float[o.size][2];
     float[][] wallLSide = new float[o.size][2];
@@ -183,6 +199,24 @@ class PlayerShip {
     }
     return wallConflict;
   }
+
+  boolean squareCheck(PlayerShip other) {
+    if (abs(centroidX - other.centroidX) < 2*radiusPoint 
+    && abs(centroidY - other.centroidY) < 2*radiusPoint) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  void update() {
+    coords[0][0] = centroidX + radiusPoint * cos(rotateAngle);
+    coords[0][1] = centroidY + radiusPoint * sin(rotateAngle);
+    coords[1][0] = centroidX + radiusBase * cos(rotateAngle + triAng1);
+    coords[1][1] = centroidY + radiusBase * sin(rotateAngle + triAng1);
+    coords[2][0] = centroidX + radiusBase * cos(rotateAngle + triAng2);
+    coords[2][1] = centroidY + radiusBase * sin(rotateAngle + triAng2);
+  }
   
   boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {
     float denominator=((P2[0]-P1[0])*(Q2[1]-Q1[1]))-((P2[1]-P1[1])*(Q2[0]-Q1[0]));
@@ -195,6 +229,62 @@ class PlayerShip {
     
     float r = num1 / denominator;
     float s = num2 / denominator;
+    
+    return (r >= 0 && r <= 1) && (s >= 0 && s<= 1);
+  }
+
+  void shoot() {
+    for (int i = 0; i < bullets.length; i++) {
+      if (bullets[i].onHold == true) {
+        bullets[i].shoot(coords[0][0], coords[0][1], rotateAngle);
+        break;
+      }
+    }
+  }
+
+  void bullet() {
+    for (int i = 0; i < bullets.length; i++) {
+      Bullet b = bullets[i];
+      b.rotate += PI/100;
+      if (b.onHold == false && !(b.x > width + b.rad || b.x < 0 - b.rad || 
+      b.y > height + b.rad|| b.y < 0 - b.rad)) {
+        b.moveForward(bulletSpeed); 
+      }
+      else {
+        if (b.reloadCounter < b.reload && b.onHold == false) {
+          b.reloadCounter++;
+        }
+        else {
+          b.hold(i, numBullets, centroidX, centroidY);
+        }
+      }
+      b.display();
+    }
+  }
+  
+  void display() {
+    stroke(255, 255, 255);
+    fill(red, green, blue);
+    triangle(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
+    coords[2][0], coords[2][1]);
+    fill(255,255,255);
+    ellipse(centroidX,centroidY, 20, 20);
+    bullet();
+  }
+  
+ /* 
+  boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {
+    float denominator=((P2[0]-P1[0])*(Q2[1]-Q1[1]))-((P2[1]-P1[1])*(Q2[0]-Q1[0]));
+    float nu;
+        i--;1[0])*(Q2[1]-Q1[1]));
+    float num2=((P1[1]-Q1[1])*(P2[0]-P1[0]))-((P1[0]-Q1[0])*(P2[1]-P1[1]));
+    
+    if (denominator == 0) {
+      return (num1 == 0 && num2 == 0);
+    }
+    
+    float r = num1 / denominator;
+    float s = num2 / dominator;
     
     return (r >= 0 && r <= 1) && (s >= 0 && s<= 1);
   }
@@ -217,43 +307,5 @@ class PlayerShip {
     }
     return false;
   }
-
-  boolean squareCheck(PlayerShip other) {
-    if (abs(centroidX - other.centroidX) < 2*radiusPoint 
-    && abs(centroidY - other.centroidY) < 2*radiusPoint) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-  void update() {
-    coords[0][0] = centroidX + radiusPoint * cos(rotateAngle);
-    coords[0][1] = centroidY + radiusPoint * sin(rotateAngle);
-    coords[1][0] = centroidX + radiusBase * cos(rotateAngle + triAng1);
-    coords[1][1] = centroidY + radiusBase * sin(rotateAngle + triAng1);
-    coords[2][0] = centroidX + radiusBase * cos(rotateAngle + triAng2);
-    coords[2][1] = centroidY + radiusBase * sin(rotateAngle + triAng2);
-  }
-
-  void display() {
-    stroke(255, 255, 255);
-    fill(red, green, blue);
-    triangle(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
-    coords[2][0], coords[2][1]);
-    fill(255,255,255);
-    ellipse(centroidX,centroidY, 20, 20);
-    for (int i = 0; i < bullets.size(); i++) {
-      Bullet b = bullets.get(i);
-      if (!(b.x > width + b.rad || b.x < 0 - b.rad || 
-      b.y > height + b.rad|| b.y < 0 - b.rad)) {
-        b.moveForward(8);
-      }
-      else {
-        bullets.remove(i);
-        i--;
-      }
-      b.display();
-    }
-  }
+  */
 }
