@@ -4,14 +4,15 @@ ArrayList<PlayerShip> collisions = new ArrayList<PlayerShip>();
 
 int w;
 int h;
+int wallLength;
+int wallHeight;
 
 int reload = 5;
 int reloadCount = 5;
 int speed = 5;
 boolean[] keys = new boolean[255];
 
-
-float[][] boundaries = new float[players.length][2];
+Wall[] walls;
 
 void setup() {
   size(800, 600);
@@ -19,6 +20,11 @@ void setup() {
   players[0] = new PlayerShip(0, 0, 0);
   w = players[0].w;
   h = players[0].h;
+  wallLength = width/20;
+  wallLength = height/20;
+  walls = new Wall[10];
+  for (int i = 0; i < walls.length; i ++)
+    walls[i] = new Wall(width/2 - 60, height/2 - 60, wallLength, wallHeight, false);
   setupPlayers();
   
 }
@@ -34,6 +40,9 @@ void draw() {
       players[i].display();
     }
   }
+  for (int i = 0; i < walls.length; i ++)
+    if (walls[i].isDestroyed == false)
+      walls[i].display();
 }
 
 void keyPressed() {
