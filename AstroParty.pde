@@ -33,6 +33,7 @@ void setup() {
   maxAsteroids = 10;
   asteroids = new Asteroid[int(random(2, maxAsteroids))];
   asteroidsSetup();
+}
   
 void draw() {
   background(0, 0, 0);
@@ -111,9 +112,6 @@ void checkPlayers(int player) {
             players[i].shipDetect = true;
             collisions.add(players[player]);
             collisions.add(players[i]);
-            players[player].collideMove(players[i], speed);
-          } else {
-            players[player].collideMove(players[i], speed);
           }
           return;
         } else {
