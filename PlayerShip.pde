@@ -85,16 +85,10 @@ class PlayerShip {
     }
   }
   
-  void collideMove(PlayerShip other, int speed) {
-    float xDistance = (centroidX - other.centroidX)/circleHitbox;
-    float yDistance = (centroidY - other.centroidY)/circleHitbox;
-    float normX = -1 * yDistance;
-    float normY = xDistance;
-    float normDot = (speed * cos(rotateAngle) * normX) + (speed * sin(rotateAngle) * normY);
-    float collisionDot = (speed * cos(rotateAngle) * xDistance) + (speed * sin(rotateAngle) * yDistance);
-}
-  
   boolean circleIntersect(PlayerShip other) {
+    if (destroyed || other.destroyed) {
+      return false;
+    }
     float xDistance = centroidX - other.centroidX;
     float yDistance = centroidY - other.centroidY;
     float hypotenuse = sqrt(pow(xDistance, 2) + pow(yDistance, 2));
@@ -137,7 +131,7 @@ class PlayerShip {
       }
     }
     else {
-      if (coords[0][1] + bounceY > height) { 
+      if (coords[0][1] + bounceY > height) {
         other.centroidY -= bounceY;
       }
       else {
@@ -330,12 +324,6 @@ class PlayerShip {
     coords[2][0], coords[2][1]);
     bullet();
   }
-  
-  
-  //AI
-  
-  
-  
   
  /* 
   boolean intersect(float[] P1 , float[] P2, float[] Q1, float[] Q2) {

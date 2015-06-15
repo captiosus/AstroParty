@@ -6,12 +6,16 @@ int w;
 int h;
 
 int reload = 5;
-int reloadCount = 5;
-int speed = 5;
+int reloadCount = 0;
+int speed = 3;
 boolean[] keys = new boolean[255];
 
 
 float[][] boundaries = new float[players.length][2];
+
+int maxAsteroids;
+Asteroid[] asteroids;
+float asteroidSpeed = 0.3;
 
 void setup() {
   size(800, 600);
@@ -20,12 +24,16 @@ void setup() {
   w = players[0].w;
   h = players[0].h;
   setupPlayers();
-  
+  maxAsteroids = 10;
+  asteroids = new Asteroid[int(random(2, maxAsteroids))];
+  asteroidsSetup();
 }
 void draw() {
   background(0, 0, 0);
   updateKeys();
   movePlayers();
+  asteroidsCheck();
+  asteroids();
   for (int i = 0; i < players.length; i++) {
     if (!players[i].destroyed) {
       checkBullets(players[i]);
@@ -82,10 +90,6 @@ void checkPlayers(int player) {
             players[i].shipDetect = true;
             collisions.add(players[player]);
             collisions.add(players[i]);
-            players[player].collideMove(players[i], speed);
-          }
-          else {
-            players[player].collideMove(players[i], speed);
           }
           return;
         }
@@ -105,7 +109,7 @@ void checkPlayers(int player) {
     }
   }
 }
-
+ 
 void checkBullets(PlayerShip player) {
   for (int i = 0; i < (player.bullets).length; i++) {
     if (!(player.bullets[i]).onHold) {
@@ -120,7 +124,7 @@ void checkBullets(PlayerShip player) {
       }
     }
   }
-}
+} 
     
 void setupPlayers() {
   int xStart = w * 5;
@@ -133,5 +137,32 @@ void setupPlayers() {
 void movePlayers() {
   for (int i = 0; i < players.length; i++) {
     players[i].moveForward(speed);
+  }
+}
+
+void asteroidsCheck() {
+  for (int i = 0; i < asteroids.length; i++) {
+    for (int j = 0; j < asteroids.length; j++) {
+      if (i != j) {
+        asteroids[i].asteroidCollide(asteroids[j]);
+      }
+    }
+    for (int k = 0; k < players.length; k++) {
+      asteroids[i].playerCollide(players[k]);
+    }
+  }
+}
+
+void asteroidsSetup() {
+  for (int i = 0; i < asteroids.length; i++) {
+    asteroids[i] = new Asteroid(int(random(5, 8))*5, 
+    random(100, width-100), random(100, height-100), asteroidSpeed);
+  }
+}
+
+void asteroids() {
+  for (int i = 0; i < asteroids.length; i++) {
+    asteroids[i].move();
+    asteroids[i].display();
   }
 }
