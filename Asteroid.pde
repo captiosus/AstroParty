@@ -5,7 +5,6 @@ class Asteroid {
   float ypos;
   float angle;
   float speed;
-  boolean isSmashed;
   
   float squareX = xpos - diameter/2;
   float squareY = ypos - diameter/2;
@@ -16,7 +15,6 @@ class Asteroid {
     ypos = y;
     this.speed = speed;
     angle = random(-1*PI/2, PI/2);
-    isSmashed = false;
   }
 
   void move() {

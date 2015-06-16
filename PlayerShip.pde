@@ -28,6 +28,8 @@ class PlayerShip {
   boolean destroyed;
   boolean wallCollide;
   
+  int numKills = 0;
+  
   PlayerShip(int x, int y, int player) {
     destroyed = false;
     for (int i = 0; i < bullets.length; i++) {

@@ -16,8 +16,19 @@ int maxAsteroids;
 Asteroid[] asteroids;
 float asteroidSpeed = 0.3;
 
+int level = 0;
+PImage backImage;
+PFont name;
+
+int targetKills;
+int numKills = 0;
+
+int victor;
+
 void setup() {
   size(800, 600);
+  backImage = loadImage("space.jpg");
+  image(backImage, 0, 0, 800, 600);
   frameRate(60);
   players[0] = new PlayerShip(0, 0, 0);
   w = players[0].w;
@@ -64,25 +75,80 @@ void setup() {
 }
   
 void draw() {
-  background(0, 0, 0);
-  updateKeys();
-  movePlayers();
-  asteroidsCheck();
-  asteroids();
-  for (int i = 0; i < players.length; i++) {
-    if (!players[i].destroyed) {
-      checkBullets(players[i]);
-      checkPlayers(i);
-      wallCheck(players[i]);
-      players[i].update();
-      players[i].display();
+  image(backImage, 0, 0, 800, 600);
+  if (level == 0) {
+    textAlign(CENTER);
+    textSize(100);
+    text("ASTRO PARTY", 400, 300);
+    textSize(30);
+    text("Press any key to start", 400, 350);
+    if(keyPressed == true || mousePressed == true) {
+      level = 1;
     }
   }
-  for (int i = 0; i < walls.length; i ++) {
-    walls[i].display();
+  else if (level == 1) {
+    name = createFont("f", 1000);
+    textAlign(CENTER);
+    textSize(30);
+    text("Please select", 400, 250);
+    textSize(20);
+    text("Quick : 1 kill", 160, 300);
+    text("Standard : 3 kills", 380, 300);
+    text("Longer : 5 kills", 600, 300);
+    if (mousePressed == true) {
+      mouseClicked();
+    }
+  }
+  else if (level == 2) {
+    updateKeys();
+    movePlayers();
+    asteroidsCheck();
+    asteroids();
+    for (int i = 0; i < players.length; i++) {
+      if (!players[i].destroyed) {
+        checkBullets(players[i]);
+        checkPlayers(i);
+        wallCheck(players[i]);
+        players[i].update();
+        players[i].display();
+      }
+    }
+    for (int j = 0; j < walls.length; j ++) {
+      walls[j].display();
+    }
+  }
+  else if (level == 3) {
+    name = createFont("f", 1000);
+    textAlign(CENTER);
+    textSize(30);
+    text("Player " + victor + " Wins!!!", 400, 250);
+    textSize(20);
+    text("Play Again", 380, 300);
   }
 }
 
+ void mouseClicked() {
+  if (level == 1) {
+    if (mouseX > 100 && mouseX < 220 && mouseY > 280 && mouseY < 310){
+      targetKills = 1;
+      level = 2;
+    }
+    if (mouseX > 300 && mouseX < 480 && mouseY > 280 && mouseY < 310){
+      targetKills = 3;
+      level = 2;
+    }
+    if (mouseX > 530 && mouseX < 680 && mouseY > 280 && mouseY < 310){
+      targetKills = 5;
+      level = 2;
+    }
+  }
+  else if (level == 3) {
+    if (mouseX > 300 && mouseX < 480 && mouseY > 280 && mouseY < 310){
+      level = 0;
+    }
+  }
+}
+    
 void keyPressed() {
   keys[keyCode] = true;
 }
@@ -159,6 +225,8 @@ void checkBullets(PlayerShip player) {
           if (players[j].squareCheckBullet(player.bullets[i])) {
             if (players[j].bulletCollide(player.bullets[i])) {
               players[j].destroy();
+              player.numKills++;
+              kill();
             }
           }
         }
@@ -166,6 +234,27 @@ void checkBullets(PlayerShip player) {
     }
   }
 } 
+
+void kill() {
+  int[] kills = new int[players.length];
+  for (int i = 0; i < players.length; i++) {
+    if (players[i].numKills >= targetKills) {
+      victor = players[i].player + 1;
+      level = 3;
+      return;
+    }
+    else {
+      kills[i] = players[i].numKills;
+    }
+  }
+  setupPlayers();
+  for (int j = 0; j < players.length; j++) {
+    players[j].numKills = kills[j];
+  }
+  asteroids = new Asteroid[int(random(2, maxAsteroids))];
+  asteroidsSetup();
+}
+  
 
 void setupPlayers() {
   players[0] = new PlayerShip(100, 100, 0);
