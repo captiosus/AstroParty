@@ -8,7 +8,7 @@ class Bullet {
   
   int rad = 5;
   
-  int reload = 50;
+  int reload = 80;
   int reloadCounter = 0;
    
   Bullet(int player) {

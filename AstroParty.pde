@@ -6,7 +6,7 @@ int w;
 int h;
 
 int reload = 5;
-int reloadCount = 0;
+int reloadCount = 5;
 int speed = 3;
 boolean[] keys = new boolean[255];
 
@@ -119,6 +119,7 @@ void updateKeys() {
 void wallCheck(PlayerShip p) {
   for (int i = 0; i < walls.length; i++)  {
     walls[i].wallCollision(p);
+    walls[i].bulletCollision(p);
   }
 }
 
@@ -187,6 +188,10 @@ void asteroidsCheck() {
     }
     for (int k = 0; k < players.length; k++) {
       asteroids[i].playerCollide(players[k]);
+      asteroids[i].bulletCheck(players[k]);
+    }
+    for (int l = 0; l < walls.length; l++) {
+      asteroids[i].wallCheck(walls[l]);
     }
   }
 }

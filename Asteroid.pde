@@ -91,6 +91,38 @@ class Asteroid {
     }
   }
   
+  void bulletCheck(PlayerShip p) {
+    for (int i = 0; i < (p.bullets).length; i++) {
+      Bullet b = p.bullets[i];
+      if (!b.onHold) {
+        float hypotenuse = sq(xpos - b.x) + sq(ypos - b.y);
+        if (sqrt(hypotenuse) <= b.rad + diameter/2) {
+          b.x = 3000;
+          b.y = 3000;
+        }
+      }
+    }
+  }
+  
+  void wallCheck(Wall o) {
+    float wallT = o.ycor;
+    float wallB = o.ycor + o.h;
+    float wallL = o.xcor;
+    float wallR = o.xcor + o.w;
+    float bulletT = ypos - diameter/2;
+    float bulletB = ypos + diameter/2;
+    float bulletL = xpos - diameter/2;
+    float bulletR = xpos + diameter/2;
+    
+     if ((bulletT < wallB && bulletT > wallT && bulletL > wallL && bulletL < wallR)
+      || (bulletT < wallB && bulletT > wallT && bulletR < wallR && bulletR > wallL)
+      || (bulletB < wallB && bulletB > wallT && bulletL > wallL && bulletL < wallR)
+      || (bulletB < wallB && bulletB > wallT && bulletR < wallR && bulletR > wallL)) {
+        angle += PI;
+     }
+  }
+      
+  
   void display() {
     stroke(255, 255, 255);
     fill(255, 255, 255);

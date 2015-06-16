@@ -65,15 +65,23 @@ class Wall {
   
   void bulletCollision (PlayerShip p){
     for (int i = 0; i < (p.bullets).length; i++) {
-      if (!p.bullets[i].onHold) {
+      Bullet b = p.bullets[i];
+      if (!b.onHold) {
         float wallT = ycor;
         float wallB = ycor + h;
         float wallL = xcor;
         float wallR = xcor + w;
-        float bulletT = p.centroidY - 10;
-        float bulletB = p.centroidY + 10;
-        float bulletL = p.centroidX - 10;
-        float bulletR = p.centroidX + 10;
+        float bulletT = b.y - b.rad;
+        float bulletB = b.y + b.rad;
+        float bulletL = b.x - b.rad;
+        float bulletR = b.x + b.rad;
+        if ((bulletT < wallB && bulletT > wallT && bulletL > wallL && bulletL < wallR)
+        || (bulletT < wallB && bulletT > wallT && bulletR < wallR && bulletR > wallL)
+        || (bulletB < wallB && bulletB > wallT && bulletL > wallL && bulletL < wallR)
+        || (bulletB < wallB && bulletB > wallT && bulletR < wallR && bulletR > wallL)) {
+          b.x = 2000;
+          b.y = 3000;
+        }
       }
     }
   }

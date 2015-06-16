@@ -280,7 +280,6 @@ class PlayerShip {
     fill(red, green, blue);
     triangle(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
     coords[2][0], coords[2][1]);
-    rect(centroidX - 10, centroidY - 10, 20, 20);
     bullet();
   }
   
