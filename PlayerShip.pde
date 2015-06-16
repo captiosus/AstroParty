@@ -12,10 +12,6 @@ class PlayerShip {
   int green;
   int blue;
   
-  boolean wallConflictT = false;
-  boolean wallConflictB = false;
-  boolean wallConflictL = false;
-  boolean wallConflictR = false;
   boolean dead = false;
   boolean shipDetect = false;
   
@@ -30,6 +26,7 @@ class PlayerShip {
   Bullet[] bullets = new Bullet[numBullets];
   
   boolean destroyed;
+  boolean wallCollide;
   
   PlayerShip(int x, int y, int player) {
     destroyed = false;
@@ -150,47 +147,6 @@ class PlayerShip {
     coords[1][1] > height || coords[1][1] < 0 ||
     coords[2][0] > width || coords[2][0] < 0 || 
     coords[2][1] > height || coords[2][1] < 0);
-  }
-  
-  void wallCollision(Wall o) {
-    float[][] wallTop = new float[o.w][2];
-    float[][] wallBottom = new float[o.w][2];
-    float[][] wallLSide = new float[o.h][2];
-    float[][] wallRSide = new float[o.h][2];
-
-    for (int i = 0; i < wallTop.length; i ++) {
-      wallTop[i][0] = o.xcor + i;
-      wallTop[i][1] = o.ycor;
-    }
-    for (int i = 0; i < wallBottom.length; i ++) {
-      wallBottom[i][0] = o.xcor + i;
-      wallBottom[i][1] = o.ycor + o.w;
-    }
-    for (int i = 0; i < wallLSide.length; i ++) {
-      wallLSide[i][0] = o.xcor;
-      wallLSide[i][1] = o.ycor + i;
-    }
-    for (int i = 0; i < wallRSide.length; i ++) {
-      wallRSide[i][0] = o.xcor + o.w;
-      wallRSide[i][1] = o.ycor + i;
-    }  
-
-    for (int i = 0; i < wallTop.length; i ++) {
-      if (sqrt(sq(centroidX - wallTop[i][0]) + sq(centroidY - wallTop[i][1])) < 10)
-        wallConflictT = true;
-    }
-    for (int i = 0; i < wallBottom.length; i ++) {
-      if (sqrt(sq(centroidX - wallBottom[i][0]) + sq(centroidY - wallBottom[i][1])) < 10)
-        wallConflictB = true;
-    }
-    for (int i = 0; i < wallLSide.length; i ++) {
-      if (sqrt(sq(centroidX - wallLSide[i][0]) + sq(centroidY - wallLSide[i][1])) < 10)
-        wallConflictL = true;
-    }
-    for (int i = 0; i < wallRSide.length; i ++) {
-      if (sqrt(sq(centroidX - wallRSide[i][0]) + sq(centroidY - wallRSide[i][1])) < 10)
-        wallConflictR = true;
-    }
   }
 
   boolean squareCheck(PlayerShip other) {
@@ -324,6 +280,7 @@ class PlayerShip {
     fill(red, green, blue);
     triangle(coords[0][0], coords[0][1], coords[1][0], coords[1][1],
     coords[2][0], coords[2][1]);
+    rect(centroidX - 10, centroidY - 10, 20, 20);
     bullet();
   }
   
